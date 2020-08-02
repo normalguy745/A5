@@ -3,9 +3,9 @@ import java.util.concurrent.Semaphore;
 public class Jacobi_Shared {
     public static void main(String[] args) {
         // EDIT THESE FOR TESTING
-        final int N = 100; // size of grid
-        final int PR = 10; // num processors/workers MUST BE A FACTOR OF N
-        final int MAXITER = 100; //number of iterations
+        final int N = 256; // size of grid
+        final int PR = 1; // num processors/workers MUST BE A FACTOR OF N
+        final int MAXITER = 10; //number of iterations
         
         double maxDiff = 0.0;
         Grid grid = new Grid(N, PR);
@@ -35,13 +35,14 @@ public class Jacobi_Shared {
             Thread.currentThread().interrupt();
         }
 
+        // END time
+        long endTime = System.nanoTime();
+
         for (double max : grid.maxDiff) {
             if (max > maxDiff) {
                 maxDiff = max;
             }
         }
-        // END time
-        long endTime = System.nanoTime();
 
         long duration = (endTime - startTime);
 
@@ -50,7 +51,7 @@ public class Jacobi_Shared {
         System.out.println("The duration is: " + duration / 1000 + " ms");
 
         //COMMENT OUT IF USING LARGE GRID
-        printArray(grid.grid);
+        // printArray(grid.grid);
 
     }
 
