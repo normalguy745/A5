@@ -10,6 +10,10 @@
 #include <stdio.h>
 #include <sys/times.h>
 #include <cstdlib>
+#include <locale.h>
+#include <stdlib.h>
+#include <time.h>
+#include <err.h>
 
 #define SHARED 1
 #define MAXGRID 258
@@ -31,6 +35,12 @@ double grid[MAXGRID][MAXGRID], newGrid[MAXGRID][MAXGRID];
 
 int main(int argc, char *argv[])
 {
+    // Set C locale settings to get niceties like thousands separators
+	// for decimal numbers.
+	setlocale(LC_NUMERIC, "");
+
+    struct timespec begin, end;
+
     // thread ids and attributes
     pthread_t workerid[MAXWORKERS];
     pthread_attr_t attr;
@@ -73,14 +83,22 @@ int main(int argc, char *argv[])
     pthread_mutex_init(&barrier, NULL);
     pthread_cond_init(&go, NULL);
 
-    start = times(&buffer);
+    if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &begin) != 0)
+	{
+		printf("Failed to get start time");
+        err(-1, "Failed to get start time");
+	}
+
     /* create the workers, then wait for them to finish */
     for (i = 0; i < numWorkers; i++)
         pthread_create(&workerid[i], &attr, Worker, (void *)i);
     for (i = 0; i < numWorkers; i++)
         pthread_join(workerid[i], NULL);
 
-    finish = times(&buffer);
+    if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end) != 0)
+	{
+		err(-1, "Failed to get end time");
+	}
 
     /* print the results */
     for (i = 0; i < numWorkers; i++)
@@ -88,8 +106,13 @@ int main(int argc, char *argv[])
         {
             maxdiff = maxDiff[i];
         }
-    printf("Maximum difference:  %e\n", maxdiff);
-    printf("Duration:  %d\n", finish - start);
+
+    long diff = end.tv_nsec - begin.tv_nsec;
+	diff += (1000 * 1000 * 1000) * (end.tv_sec - begin.tv_sec);
+    diff = diff * 0.001;
+
+    printf("Maximum difference:  %f\n", maxdiff);
+    printf("Duration:  %ld ms\n", diff);
 }
 
 void *Worker(void *arg)
