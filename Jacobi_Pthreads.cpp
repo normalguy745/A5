@@ -1,5 +1,10 @@
 //Credit: textbook
 
+//Compile with
+//g++ -pthread -fpermissive ./Jacobi_Pthreads.cpp
+//run with:
+//./a.out  GRIDSIZE NUMWORKERS ITERATIONS
+
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdio.h>
@@ -90,7 +95,7 @@ int main(int argc, char *argv[])
 void *Worker(void *arg)
 {
     int myid = (int)arg;
-    double myDiff, temp;
+    double mydiff, temp;
     int i, j, iters, firstRow, lastRow;
 
     // determine first and last rows of my strip of the grids
@@ -123,17 +128,17 @@ void *Worker(void *arg)
         Barrier();
     }
     // compute the maximum difference in my strip
-    myDiff = 0.0;
-
-    for (i = firstRow; i <= lastRow; i++)
-    {
-        for (j = 1; j <= gridSize; j++)
-        {
-            if (myDiff < abs(grid[i][j] - newGrid[i][j]))
-                myDiff = abs(grid[i][j] - newGrid[i][j]);
-        }
+   mydiff = 0.0;
+  for (i = firstRow; i <= lastRow; i++) {
+    for (j = 1; j <= gridSize; j++) {
+      temp = grid[i][j]-newGrid[i][j];
+      if (temp < 0)
+        temp = -temp;
+      if (mydiff < temp)
+        mydiff = temp;
     }
-    maxDiff[myid] = myDiff;
+  }
+  maxDiff[myid] = mydiff;
 }
 
 void Barrier()
