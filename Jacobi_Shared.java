@@ -1,11 +1,13 @@
 import java.util.concurrent.Semaphore;
 
+// Takes 3 command line arguements
+// GRIDSIZE     NUMWORKERS     ITERATIONS
 public class Jacobi_Shared {
     public static void main(String[] args) {
         // EDIT THESE FOR TESTING
-        final int N = 256; // size of grid
-        final int PR = 1; // num processors/workers MUST BE A FACTOR OF N
-        final int MAXITER = 10; //number of iterations
+        final int N = Integer.parseInt(args[0]); // size of grid
+        final int PR = Integer.parseInt(args[1]); // num processors/workers MUST BE A FACTOR OF N
+        final int MAXITER = Integer.parseInt(args[2]); //number of iterations
         
         double maxDiff = 0.0;
         Grid grid = new Grid(N, PR);
