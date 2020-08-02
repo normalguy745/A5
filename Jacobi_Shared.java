@@ -49,7 +49,8 @@ public class Jacobi_Shared {
         System.out.println("The maximum difference is: " + maxDiff);
         System.out.println("The duration is: " + duration / 1000 + " ms");
 
-        // printArray(grid.grid);
+        //COMMENT OUT IF USING LARGE GRID
+        printArray(grid.grid);
 
     }
 
